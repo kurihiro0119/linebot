@@ -32,4 +32,22 @@ def hello_world():
 
 @app.route("/callback", methods=["POST"])
 def callback():
-    signature = 
+    signature = request.headers['X-Line-Signature']
+    body = request.get_data(as_text=true)
+    app.longer.info("Request body: " + body)
+
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
+    
+    return 'OK'
+
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=event.message.text)
+    )
+
+
